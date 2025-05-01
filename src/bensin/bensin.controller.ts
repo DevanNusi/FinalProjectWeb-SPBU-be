@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   ParseIntPipe,
   HttpCode,
   HttpStatus,

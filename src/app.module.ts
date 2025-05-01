@@ -1,0 +1,42 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { BensinModule } from './bensin/bensin.module';
+import { PembeliModule } from './pembeli/pembeli.module';
+import { CuciMobilModule } from './cuci-mobil/cuci-mobil.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('POSTGRES_HOST'),
+        port: configService.get<string>('POSTGRES_PORT')
+          ? configService.get<number>('POSTGRES_PORT')
+          : 5432,
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        username: configService.get<string>('POSTGRES_USER'),
+        database: configService.get<string>('POSTGRES_DATABASE'),
+        migrations: ['dist/migrations/*.js'],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
+        ssl: true,
+      }),
+    }),
+    AuthModule,
+    UserModule,
+    BensinModule,
+    PembeliModule,
+    CuciMobilModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
